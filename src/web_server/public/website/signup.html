@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSL Bridge - Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: #68a4bc;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 2rem;
+            margin: 0;
+            color: #ffcc00;
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .signup-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        
+        h2 {
+            color: #68a4bc;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .checkbox-container input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        button {
+            background-color: #68a4bc;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #5a8fa6;
+        }
+        
+        #status-message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: green;
+        }
+        
+        .error {
+            color: red;
+        }
+        
+        .links {
+            margin-top: 20px;
+        }
+        
+        .links a {
+            color: #68a4bc;
+            text-decoration: none;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .separator span {
+            padding: 0 10px;
+            color: #777;
+        }
+        
+        .social-button {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .social-button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logoNoBackground.png" alt="BSL Bridge Logo"> 
+            <h1>BSL Bridge</h1>
+        </div>
+        <p class="tagline">TRANSLATING ONE SIGN AT A TIME</p>
+    </header>
+    
+    <div class="signup-container">
+        <form id="signup-form">
+            <h2>Create an Account</h2>
+            <input type="text" id="fullname" placeholder="Full Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+            <input type="text" id="piid" placeholder="Device ID (on side container)" required>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the Terms and Conditions</label>
+            </div>
+            
+            <button type="submit" id="signup-button">Sign Up</button>
+            
+            <div id="status-message"></div>
+            
+            <div class="separator">
+                <span>or</span>
+            </div>
+            
+            <button type="button" id="google-signup" class="social-button">
+                <img src="https://cdn.cdnlogo.com/logos/g/35/google-icon.svg" alt="Google">
+                Sign up with Google
+            </button>
+            
+            <div class="links">
+                <a href="login.html">Already have an account? Login</a><br>
+                <a href="main.html">Back to Home</a>
+            </div>
+        </form>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 BSL Bridge. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    
+    <!-- Only include Firebase database (no auth) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEzhS9bkzcN5-YLuvta9Vm2aYM6DYl2PU",
+            authDomain: "bsltranslator-93f00.firebaseapp.com",
+            databaseURL: "https://bsltranslator-93f00-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bsltranslator-93f00",
+            storageBucket: "bsltranslator-93f00.appspot.com",
+            messagingSenderId: "547548973040",
+            appId: "1:547548973040:web:4c7b2802aedcf6e84a7f35",
+            measurementId: "G-9T2S36E0LJ"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        console.log("Firebase initialized with v8 SDK - Database Only Mode");
+        
+        // Handle form submission
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const statusMessage = document.getElementById('status-message');
+            const signupButton = document.getElementById('signup-button');
+            const piid = document.getElementById('piid').value;
+
+            // Clear previous messages
+            statusMessage.textContent = '';
+            statusMessage.className = '';
+            
+            // Basic validation
+            if (password !== confirmPassword) {
+                statusMessage.textContent = 'Passwords do not match!';
+                statusMessage.className = 'error';
+                return;
+            }
+            
+            // Show loading state
+            signupButton.innerHTML = 'Creating Account...';
+            signupButton.disabled = true;
+            
+            // Generate a random ID for the user
+            const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            
+            // Store all user data directly in the database as plain text
+            firebase.database().ref('plaintext_users/' + userId).set({
+                fullname: fullname,
+                email: email,
+                password: password, // Storing password as plain text as requested
+                piid: piid,
+                timestamp: new Date().toISOString()
+            })
+            .then(function() {
+                console.log("User data stored successfully as plain text");
+                
+                // Also log the signup event
+                return firebase.database().ref('plaintext_logs/').push({
+                    event: "signup",
+                    email: email,
+                    fullname: fullname,
+                    piid: piid,
+                    timestamp: new Date().toISOString()
+                });
+            })
+            .then(function() {
+                // Show success message
+                statusMessage.textContent = 'Account created successfully! Redirecting...';
+                statusMessage.className = 'success';
+                
+                // Store user info in localStorage for convenience
+                localStorage.setItem('logged_in', 'true');
+                localStorage.setItem('email', email);
+                localStorage.setItem('fullname', fullname);
+                localStorage.setItem('user_id', userId);
+                localStorage.setItem('pi_id', piid);
+                
+                // Redirect to main page after a short delay
+                setTimeout(function() {
+                    window.location.href = 'webpage.html';
+                }, 1500);
+            })
+            .catch(function(error) {
+                // Error handling
+                console.error("Error:", error);
+                
+                // Log failure to database
+                firebase.database().ref('plaintext_errors/').push({
+                    email: email,
+                    error_message: error.message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Reset button state
+                signupButton.innerHTML = 'Sign Up';
+                signupButton.disabled = false;
+                
+                statusMessage.textContent = 'Signup failed: ' + error.message;
+                statusMessage.className = 'error';
+            });
+        });
+        
+        // Google Sign-up
+        document.getElementById('google-signup').addEventListener('click', function() {
+            const statusMessage = document.getElementById('status-message');
+            
+            // Since we're bypassing authentication, let's create a mock Google signup
+            // that directly stores data in Firebase
+            
+            statusMessage.textContent = 'Google sign-up simulation: Storing plain text data...';
+            
+            // Generate a random ID and fake Google user data
+            const userId = 'google_user_' + Math.random().toString(36).substr(2, 9);
+            const randomName = 'Google User ' + Math.floor(Math.random() * 1000);
+            const randomEmail = 'google_user_' + Math.floor(Math.random() * 1000) + '@gmail.com';
+            
+            // Store fake Google user data directly in the database
+            firebase.database().ref('plaintext_users/' + userId).set({
+                fullname: randomName,
+                email: randomEmail,
+                provider: 'google',
+                timestamp: new Date().toISOString()
+            })
+            .then(function() {
+                console.log("Mock Google user data stored successfully as plain text");
+                
+                // Also log the signup event
+                return firebase.database().ref('plaintext_logs/').push({
+                    event: "google_signup",
+                    email: randomEmail,
+                    fullname: randomName,
+                    timestamp: new Date().toISOString()
+                });
+            })
+            .then(function() {
+                // Show success message
+                statusMessage.textContent = 'Google account created successfully! Redirecting...';
+                statusMessage.className = 'success';
+                
+                // Store user info in localStorage for convenience
+                localStorage.setItem('logged_in', 'true');
+                localStorage.setItem('email', randomEmail);
+                localStorage.setItem('fullname', randomName);
+                localStorage.setItem('user_id', userId);
+                
+                // Redirect to main page after a short delay
+                setTimeout(function() {
+                    window.location.href = 'webpage.html';
+                }, 1500);
+            })
+            .catch(function(error) {
+                // Error handling
+                console.error("Error:", error);
+                
+                statusMessage.textContent = 'Google sign-up failed: ' + error.message;
+                statusMessage.className = 'error';
+            });
+        });
+    </script>
+</body>
+</html>
