@@ -14,7 +14,7 @@ import time
 import json
 from pathlib import Path
 from collections import Counter
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple, Dict, Any
 
 import cv2
 import numpy as np
@@ -145,6 +145,10 @@ class BSLDemo:
         # Camera
         self.cap = None
         
+        # FPS tracking
+        self.last_frame_time = time.time()
+        self.fps = 0.0
+        
         # Output file for web server integration
         self.translation_file = Path("translation_data.json")
     
@@ -242,14 +246,20 @@ class BSLDemo:
         
         return frame, translation_info
     
-    def draw_ui(self, frame: np.ndarray, info: Dict) -> np.ndarray:
-        """Draw UI overlay on frame."""
+    def draw_ui(self, frame: np.ndarray, info: Dict[str, Any]) -> np.ndarray:
+        """Draw UI overlay on frame including FPS counter."""
         H, W, _ = frame.shape
         
         # Semi-transparent overlay
         overlay = frame.copy()
         cv2.rectangle(overlay, (0, H - 150), (W, H), (0, 0, 0), -1)
         frame = cv2.addWeighted(overlay, 0.5, frame, 0.5, 0)
+        
+        # FPS counter (top-right corner)
+        cv2.putText(
+            frame, f"FPS: {self.fps:.1f}",
+            (W - 120, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2
+        )
         
         # Current input
         cv2.putText(
@@ -318,6 +328,11 @@ class BSLDemo:
                 
                 # Mirror effect
                 frame = cv2.flip(frame, 1)
+                
+                # Calculate FPS
+                current_time = time.time()
+                self.fps = 1.0 / max(current_time - self.last_frame_time, 0.001)
+                self.last_frame_time = current_time
                 
                 # Process frame
                 processed_frame, translation_info = self.process_frame(frame)

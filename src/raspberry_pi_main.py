@@ -5,15 +5,20 @@ Processes BSL video streams from Firebase Realtime Database.
 Usage:
     python src/raspberry_pi_main.py [stream_id]
     
+Environment Variables:
+    FIREBASE_DATABASE_URL: Firebase Realtime Database URL
+    FIREBASE_CREDENTIALS_PATH: Path to Firebase credentials JSON
+    
 If no stream_id provided, will prompt for stream selection.
 """
 
+import os
 import sys
 import time
 import json
 import base64
 from pathlib import Path
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, Any
 
 import cv2
 import numpy as np
@@ -43,7 +48,7 @@ from demo_standalone import GestureTracker
 class FirebaseStreamProcessor:
     """Processes BSL video streams from Firebase."""
     
-    def __init__(self, stream_id: str):
+    def __init__(self, stream_id: str) -> None:
         """Initialize Firebase stream processor."""
         self.stream_id = stream_id
         self.config = Config()
@@ -109,19 +114,19 @@ class FirebaseStreamProcessor:
                     json={"translation": text},
                     timeout=1
                 )
-            except:
+            except Exception:
                 pass  # File update is primary
             
             logger.info(f"Translation: {text}")
         except Exception as e:
             logger.warning(f"Could not update translation: {e}")
     
-    def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, Dict]:
+    def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, Dict[str, Any]]:
         """Process frame - same logic as demo_standalone."""
         # Detect hands
         landmarks, bboxes = self.hand_detector.detect(frame)
         
-        translation_info = {
+        translation_info: Dict[str, Any] = {
             "current_input": self.tracker.current_input,
             "suggestions": [],
             "detected_words": self.tracker.detected_words
@@ -153,7 +158,7 @@ class FirebaseStreamProcessor:
         
         # Finalize word
         if self.tracker.should_finalize_word():
-            word = self.tracker.finalize_word(self.word_predictor)
+            self.tracker.finalize_word(self.word_predictor)
             translation = self.tracker.get_translation()
             self.update_translation_file(translation)
         
@@ -162,9 +167,9 @@ class FirebaseStreamProcessor:
         
         return frame, translation_info
     
-    def draw_ui(self, frame: np.ndarray, info: Dict) -> np.ndarray:
+    def draw_ui(self, frame: np.ndarray, info: Dict[str, Any]) -> np.ndarray:
         """Draw UI overlay."""
-        H, W, _ = frame.shape  # Fixed: removed parentheses
+        H, W, _ = frame.shape
         
         # Current input
         cv2.putText(
@@ -281,28 +286,44 @@ class FirebaseStreamProcessor:
 
 
 def initialize_firebase() -> bool:
-    """Initialize Firebase Admin SDK."""
+    """
+    Initialize Firebase Admin SDK.
+    
+    Supports environment variables:
+    - FIREBASE_DATABASE_URL: Firebase Realtime Database URL
+    - FIREBASE_CREDENTIALS_PATH: Path to credentials JSON file
+    """
+    # Get database URL from environment or use default
+    database_url = os.getenv(
+        'FIREBASE_DATABASE_URL',
+        'https://bsltranslator-93f00-default-rtdb.europe-west1.firebasedatabase.app/'
+    )
+    
+    env_cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH')
+    
     try:
         script_dir = Path(__file__).parent
         cwd = Path.cwd()
         
         credential_paths = [
+            env_cred_path,
             'bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json',
             script_dir / 'bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json',
             cwd / 'bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json',
+            'firebase-credentials.json',
         ]
         
         for cred_path in credential_paths:
-            if cred_path.exists():
+            if cred_path and Path(cred_path).exists():
                 cred = credentials.Certificate(str(cred_path))
                 firebase_admin.initialize_app(cred, {
-                    'databaseURL': 'https://bsltranslator-93f00-default-rtdb.europe-west1.firebasedatabase.app/'
+                    'databaseURL': database_url
                 })
-                logger.info(f"Firebase initialized: {cred_path.name}")
+                logger.info(f"Firebase initialized: {Path(cred_path).name}")
                 return True
         
         logger.error("Firebase credentials not found!")
-        logger.error("Expected file: bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json")
+        logger.error("Set FIREBASE_CREDENTIALS_PATH environment variable")
         return False
         
     except Exception as e:
@@ -330,7 +351,7 @@ def get_stream_id() -> Optional[str]:
         return None
 
 
-def main():
+def main() -> None:
     """Entry point for Raspberry Pi mode."""
     logger.info("=" * 60)
     logger.info("BSL Bridge Integration Starting...")

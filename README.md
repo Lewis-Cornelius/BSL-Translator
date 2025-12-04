@@ -7,9 +7,6 @@
 [![Tests](https://img.shields.io/badge/tests-28%20passing-brightgreen.svg)](.github/workflows/ci.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-<!-- TODO: Add demo GIF here -->
-<!-- ![Demo](docs/demo.gif) -->
-
 ---
 
 ## 🎯 Overview
