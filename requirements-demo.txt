@@ -1,0 +1,11 @@
+# BSL Translator - Minimal Demo Dependencies
+# For standalone PC webcam demo only (no Firebase)
+
+# Computer Vision & ML
+opencv-python==4.11.0.86
+mediapipe==0.10.21
+scikit-learn==1.6.1
+numpy==1.26.4
+
+# NLP for word prediction
+nltk==3.9.1

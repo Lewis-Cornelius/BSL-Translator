@@ -1,0 +1,15 @@
+# BSL Translator - Development Dependencies
+# Additional tools for development, testing, and code quality
+
+# Testing
+pytest==8.3.4
+pytest-cov==6.0.0
+
+# Code Quality
+black==24.3.0
+flake8==7.0.0
+mypy==1.13.0
+
+# Development Tools
+ipython==8.31.0
+jupyter==1.1.1
