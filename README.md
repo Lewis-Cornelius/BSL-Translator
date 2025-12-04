@@ -8,6 +8,31 @@ A real-time British Sign Language (BSL) translator that uses computer vision and
 
 ![Logo](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/project/server/website/logo.png)
 
+## ⚡ Quick Start - Try It Now!
+
+**Want to test BSL translation on your computer in under 2 minutes?**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Lewis-Cornelius/BSL-Translator
+cd BSL-Translator
+
+# 2. Install Python dependencies
+pip install -r requirements.txt
+
+# 3. Run the standalone webcam mode
+python project/server/bsl_webcam_standalone.py
+```
+
+That's it! A webcam window will open showing:
+- 📹 **Live video** with hand landmark detection
+- 🔤 **Real-time letter recognition** from BSL gestures
+- 💬 **Automatic word completion** and sentence formation
+
+**No server, no Firebase, no Raspberry Pi needed!**
+
+---
+
 ## Features
 
 ✨ **Real-time Translation** - Instant BSL gesture recognition using your camera  

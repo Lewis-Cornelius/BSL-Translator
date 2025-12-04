@@ -128,6 +128,52 @@ app.post('/start-interpreter', (req, res) => {
   }
 });
 
+
+// API route to start webcam mode (PC camera)
+app.post('/start-webcam-mode', (req, res) => {
+  try {
+    console.log('Starting BSL Translator in PC Webcam Mode');
+    
+    // Launch the Python webcam script
+    const { spawn } = require('child_process');
+    const pythonProcess = spawn('python', ['bsl_webcam_standalone.py'], {
+      cwd: __dirname  // Run in the server directory
+    });
+    
+    // Store the process ID for potential later termination
+    fs.writeFileSync('webcam_pid.txt', pythonProcess.pid.toString());
+    
+    // Log stdout and stderr
+    pythonProcess.stdout.on('data', (data) => {
+      console.log(`Webcam Mode: ${data}`);
+      fs.appendFileSync('webcam_output.log', data);
+    });
+    
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Webcam Mode Error: ${data}`);
+      fs.appendFileSync('webcam_error.log', data);
+    });
+    
+    // Handle process exit
+    pythonProcess.on('close', (code) => {
+      console.log(`Webcam mode process exited with code ${code}`);
+    });
+    
+    res.json({
+      success: true,
+      message: 'PC Webcam Mode started successfully',
+      pid: pythonProcess.pid,
+      info: 'A webcam window will open. Translation will appear on this page.'
+    });
+  } catch (err) {
+    console.error('Error starting webcam mode:', err);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to start webcam mode: ' + err.message 
+    });
+  }
+});
+
 // Default route handler
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'website', 'main.html'));
