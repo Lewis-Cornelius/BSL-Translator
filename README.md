@@ -1,211 +1,273 @@
-# BSL Translator
+# BSL Translator - Real-Time British Sign Language Recognition
 
-[![Python](https://img.shields.io/badge/Python-3.11.9-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-Required-brightgreen.svg)](https://nodejs.org/)
+> Computer vision system translating BSL fingerspelling to text using MediaPipe + scikit-learn
 
-A real-time British Sign Language (BSL) translator that uses computer vision and machine learning to recognize hand gestures and convert them to text. The system uses MediaPipe for hand landmark detection and a custom-trained ML model for gesture classification.
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-28%20passing-brightgreen.svg)](.github/workflows/ci.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-![Logo](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/project/server/website/logo.png)
-
-## ⚡ Quick Start - Try It Now!
-
-**Want to test BSL translation on your computer in under 2 minutes?**
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/Lewis-Cornelius/BSL-Translator
-cd BSL-Translator
-
-# 2. Install Python dependencies
-pip install -r requirements.txt
-
-# 3. Run the standalone webcam mode
-python project/server/bsl_webcam_standalone.py
-```
-
-That's it! A webcam window will open showing:
-- 📹 **Live video** with hand landmark detection
-- 🔤 **Real-time letter recognition** from BSL gestures
-- 💬 **Automatic word completion** and sentence formation
-
-**No server, no Firebase, no Raspberry Pi needed!**
+<!-- TODO: Add demo GIF here -->
+<!-- ![Demo](docs/demo.gif) -->
 
 ---
 
-## Features
+## 🎯 Overview
 
-✨ **Real-time Translation** - Instant BSL gesture recognition using your camera  
-🤖 **Machine Learning** - Custom-trained model for accurate gesture classification  
-🔄 **Smart Auto-correction** - Improves word prediction accuracy  
-📱 **Raspberry Pi Support** - Deploy on embedded hardware with camera module  
-🌐 **Web Interface** - User-friendly web application with authentication  
-🔥 **Firebase Integration** - Cloud-based data synchronization and storage
+Real-time BSL (British Sign Language) fingerspelling translator that:
+- Detects hand landmarks using **MediaPipe**
+- Classifies BSL letters with a custom **Random Forest model**
+- Autocorrects to valid English words using **NLTK**
+- Supports both **Raspberry Pi deployment** and **standalone demo mode**
 
-## Installation
+**Built to demonstrate:** Real-time CV pipeline, ML deployment, cloud integration, and embedded systems.
 
-### Installation on a laptop/pc
+---
 
-**Prerequisites:**
-- Python 3.11.9
-- Node.js and npm
-- Git
+## ⚡ Quick Demo (2 Minutes)
 
-**Steps:**
+No hardware needed! Test the system on your laptop:
 
 ```bash
 git clone https://github.com/Lewis-Cornelius/BSL-Translator
 cd BSL-Translator
+pip install -r requirements-demo.txt
+python src/demo_standalone.py
 ```
 
-Open the project in VS Code or your preferred editor and run these commands in the terminal:
+A webcam window will open with real-time BSL translation. Make BSL letters (A-Z) and watch the translation appear!
+
+---
+
+## 🏗️ Architecture
 
 ```
-python -m venv myenv
-myenv\Scripts\activate
+┌──────────┐      ┌──────────┐      ┌───────────┐      ┌──────────┐
+│ Camera   │─────▶│MediaPipe │─────▶│Classifier │─────▶│   NLTK   │
+│  (CV2)   │frames│Hand Det. │coords│(sklearn)  │letters│Autocorr. │
+└──────────┘      └──────────┘      └───────────┘      └────┬─────┘
+                                                              │
+                                  ┌───────────────────────────▼─────┐
+                                  │  Output: "HELLO" → Hello, etc.  │
+                                  └─────────────────────────────────┘
+```
+
+**Two deployment modes:**
+1. **Standalone:** Local webcam → OpenCV window (quick demo)
+2. **Production:** Raspberry Pi → Firebase → Web dashboard
+
+See [Architecture Details](docs/training-guide.md)
+
+---
+
+## 📊 Tech Stack
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Hand Detection** | MediaPipe | 21-point hand landmark extraction |
+| **Gesture Classifier** | scikit-learn RandomForest | Letter prediction from landmarks |
+| **Autocorrect** | NLTK + difflib | Word completion |
+| **Streaming** | Firebase Realtime DB | Pi → Cloud data transfer |
+| **Web Server** | Express.js + Node | Dashboard backend |
+| **Frontend** | HTML/CSS/JS | User interface |
+
+---
+
+## 🚀 Installation
+
+### Quick Demo (Minimal Dependencies)
+
+```bash
+# Clone repository
+git clone https://github.com/Lewis-Cornelius/BSL-Translator
+cd BSL-Translator
+
+# Install minimal dependencies  
+pip install -r requirements-demo.txt
+
+# Run standalone demo
+python src/demo_standalone.py
+```
+
+### Full Installation (Raspberry Pi Mode)
+
+```bash
+# Install all dependencies
 pip install -r requirements.txt
-cd project
-cd server
+
+# Install Node.js dependencies
+cd src/web_server
 npm install
-npm install firebase
-npm install express body-parser cors
-```
 
-You then need to add your Firebase Admin SDK JSON file.
+# Add Firebase credentials
+# Download your Firebase Admin SDK JSON and place it in src/web_server/
+# File should be named: bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json
 
-#### Steps to Download Your Firebase Admin SDK JSON File
-1. Go to [Firebase Console](https://console.firebase.google.com/) and log in
-2. Select your project
-3. Click on the ⚙️ gear icon → **Project settings**
-4. Navigate to the **Service accounts** tab
-5. Click **Generate new private key**
-6. Save the downloaded JSON file as `bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json`
-7. Place it in `BSL-Translator/project/server`
-
-> **⚠️ IMPORTANT:** This file contains sensitive credentials. Never commit it to version control. It's already excluded in `.gitignore`.
-
-To make sure everything is installed, run:
-
-```
-python fix.py
-```
-
-If there are any missing dependencies, type `y` to fix them. OpenCV sometimes has issues, so you may need to run `pip install opencv-python`. Similarly, scikit-learn can be problematic, so try `pip install scikit-learn` if needed.
-
-To start running the server:
-```
+# Start server
 node server.js
 ```
 
-### Installation on the Raspberry Pi
-
-First, set up the Pi as shown below:
-- Camera plugged into the Raspberry Pi camera pins
-- Red LED button connected to port D2
-- Grove-LCD RGB Backlight connected to port I2C
-
-![Raspberry Pi Setup](https://github.com/Lewis-Cornelius/BSL-Translator/assets/61e809d4-83b1-43b0-ab5d-4606c24fc7a9)
-
-The only files you need from the repository are in the **`/RaspberryPi`** folder:
-- `live_stream_pi_code.py`
-- `on_off_button_pi_code.py`
-- `requirements.txt`
-
-```
-pip install -r requirements.txt
-```
-
-Open and run `on_off_button_pi_code.py`
-
-**NOTE: PLEASE PUT THE `index.html` AND `logo.png` INTO A FOLDER CALLED `templates`**
-
-## How Everything Works
-
-### Server.js
-The website backend runs using Express.js to handle communication between the BSL interpreter Python scripts and the front-end website. It manages API endpoints that read and update the translation data and provide error messages when problems occur.
-
-### BSL_bridge_integration.py
-This Python script implements real-time British Sign Language gesture recognition using OpenCV, MediaPipe, and a pre-trained ML model. It detects hand landmarks (21 points per hand) and predicts hand gestures, converting them to text through these steps:
-1. Hand detection using MediaPipe
-2. Landmark extraction and classification
-3. Gesture stabilization to prevent duplicate predictions
-4. Auto-correction to improve word prediction
-
-### Firebase_stream_handler.py
-This script handles the conversion of base64-encoded images back to actual images for display on the website and processing by the BSL translator. It manages two-way communication between the client computer and Firebase.
-
-### Raspberry Pi Implementation
-The Raspberry Pi runs two main scripts:
-- `on_off_button_pi_code.py`: Controls the LCD and camera based on button presses
-- `live_stream_pi_code.py`: Captures and streams video frames to Firebase
-
-Configuration parameters:
-```python
-FRAME_RATE = 3  # Do not exceed 5 FPS due to storage limitations
-RESOLUTION = (320, 240)  # Lower resolution for better performance
-QUALITY = 20  # JPEG compression quality
-MAX_STREAM_TIME = 300  # Maximum streaming time (5 minutes)
-```
-
-### Website Interface
-The web application includes:
-- Authentication pages (login, signup)
-- Main translator interface (webpage.html)
-- Stream connection and management
-- Real-time translation display
-
-### BSL Letter Chart
-![BSL Fingerspelling Chart](https://imgs.search.brave.com/DKomfn_cPKzVi7KigGeY5d0Jdn0WK72m8gxgMzOFH6M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9hY2Nl/c3Nic2wuY29tL3dw/LWNvbnRlbnQvdXBs/b2Fkcy8yMDIyLzEx/LzIuYWNjZXNzYnNs/LUZpbmdlcnNwZWxs/aW5nLXJpZ2h0LWhh/bmQtMS5qcGc)
-
-## Training Your Own Model
-
-To train your own model:
-
-1. **Collect Images** - Run `collect_images.py` to capture hand gestures
-   - Configure `number_of_classes` for the number of letters
-   - Update `data_dict` path to your local directory
-
-2. **Process Data** - Run `create_dataset.py` to prepare the training data
-
-3. **Train Model** - Run `train_classifier.py` to create the `model.p` file
-
-4. **Test Model** - Run `inference_classifier.py` to validate the model
-   - Update `labels_dict` to match your classes (e.g., `{0: 'A', 1: 'B', 2: 'L'}`)
-
-## System Architecture
-
-The data flows from the Raspberry Pi to Firebase, then to a PC/Laptop where the BSL is translated to text. The processed data is sent to:
-
-1. The University's Cloud Webserver (backend for website and mobile interface)
-2. Locally hosted on JS server
-
-
-## Firebase Integration
-
-The system uses Firebase for real-time data storage and synchronization:
-
-![Firebase Structure](https://github.com/Lewis-Cornelius/BSL-Translator/assets/f8e41ac4-51ef-4f1f-825d-01f8e867b1da)
-
-## Web Interface
-
-The current web interface looks like this:
-
-![Web Interface](https://github.com/Lewis-Cornelius/BSL-Translator/assets/9ce45291-fea6-4419-8a29-9f95c9cedc46)
-
-
-## Video Tutorial for Reference
-
-[![Watch the tutorial on YouTube](https://img.youtube.com/vi/MJCSjXepaAM/0.jpg)](https://www.youtube.com/watch?v=MJCSjXepaAM)
-
-## Future Development
-
-- 🎯 Improve AI model accuracy and recognition speed
-- 🚀 Optimize connection speeds and reduce latency
-
-- MediaPipe for hand landmark detection
-- Firebase for real-time data synchronization
-- The BSL community for gesture references
+> ⚠️ **Firebase credentials are sensitive!** Never commit them. Already excluded in `.gitignore`.
 
 ---
 
-**Made with ❤️ for accessibility**
+## 📁 Project Structure
+
+```
+bsl-translator/
+├── src/
+│   ├── bsl_translator/          # Main Python package
+│   │   ├── core/                # Reusable ML/CV modules
+│   │   ├── streaming/           # Firebase integration
+│   │   └── utils/               # Logging, utilities
+│   ├── demo_standalone.py       # Quick demo (no hardware)
+│   ├── raspberry_pi_main.py     # Production Pi mode
+│   └── web_server/              # Node.js backend
+├── tests/                       # Unit tests (pytest)
+├── train/                       # ML training scripts
+├── models/                      # Model files
+└── docs/                        # Documentation
+```
+
+---
+
+## 🎓 Training Your Own Model
+
+Want to train on custom gestures?
+
+```bash
+# 1. Collect training images
+python train/collect_images.py
+
+# 2. Create dataset
+python train/create_dataset.py
+
+# 3. Train classifier
+python train/train_classifier.py
+
+# Model saved to models/bsl_classifier.pkl
+```
+
+See [Training Guide](docs/training-guide.md) for details.
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+pip install -r requirements-dev.txt
+pytest
+
+# Run with coverage
+pytest --cov=src/bsl_translator
+
+# Lint code
+flake8 src/
+black --check src/
+```
+
+**Current test coverage:** 28 tests across core modules
+
+---
+
+## 🎮 Usage
+
+### Standalone Mode (Demo)
+
+```python
+# Just run it!
+python src/demo_standalone.py
+
+# Controls:
+# - Show BSL letters to camera (A-Z)
+# - Press Q or ESC to quit
+```
+
+### Raspberry Pi Mode (Production)
+
+```bash
+# Start with stream ID
+python src/raspberry_pi_main.py <stream_id>
+
+# Or let it read from active_stream.txt
+python src/raspberry_pi_main.py
+```
+
+---
+
+## 🔧 Configuration
+
+Edit `src/bsl_translator/core/config.py` to customize:
+
+```python
+@dataclass
+class Config:
+    camera: CameraConfig          # Camera settings
+    mediapipe: MediaPipeConfig    # Hand detection
+    gesture: GestureConfig        # Recognition thresholds
+    model: ModelConfig            # ML model paths
+```
+
+---
+
+## ⚠️ Limitations
+
+- **Fingerspelling only:** Recognizes BSL letters (A-Z), not full sign language
+- **Lighting sensitive:** Requires good lighting for hand detection
+- **Single signer:** Optimized for one person at a time
+- **English words:** Autocorrect uses English dictionary
+
+---
+
+## 🛣️ Roadmap
+
+- [ ] Support for BSL signs (beyond fingerspelling)
+- [ ] Multi-hand tracking improvements
+- [ ] Mobile app (Flutter/React Native)
+- [ ] Dockerized deployment
+- [ ] Performance metrics dashboard
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## 📧 Contact
+
+**Lewis Cornelius**  
+GitHub: [@Lewis-Cornelius](https://github.com/Lewis-Cornelius)
+
+---
+
+## 🙏 Acknowledgments
+
+- **MediaPipe** - Hand landmark detection
+- **scikit-learn** - Machine learning framework
+- **NLTK** - Natural language processing
+- **Firebase** - Cloud infrastructure
+
+---
+
+## 📸 Screenshots
+
+<!-- TODO: Add screenshots -->
+
+### Standalone Demo
+<!-- ![Standalone Demo](docs/screenshots/demo.png) -->
+
+### Web Dashboard
+<!-- ![Web Dashboard](docs/screenshots/dashboard.png) -->
+
+---
+
+**⭐ If you found this project helpful, please consider giving it a star!**
