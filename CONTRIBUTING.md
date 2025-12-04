@@ -63,25 +63,6 @@ Before submitting your changes:
 1. Test the ML model with various hand gestures
 2. Verify the web interface works correctly
 3. Test Firebase integration if you make backend changes
-4. Check that the Raspberry Pi code still works (if applicable)
-
-## Project Structure
-
-```
-BSL-Translator/
-├── project/
-│   └── server/          # Backend server and ML code
-│       └── website/     # Web interface
-├── RaspberryPi/         # Raspberry Pi specific code
-├── training_process/    # ML model training scripts
-├── Documentation/       # Project documentation
-└── old/                 # Deprecated code (for reference)
-```
-
-## Areas for Contribution
-
-We welcome contributions in these areas:
-
 - **Model Improvement**: Enhance the ML model accuracy
 - **New Gestures**: Add support for more BSL gestures
 - **Performance**: Optimize processing speed
