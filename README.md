@@ -1,19 +1,39 @@
-# SIGN LANGUAGE TRANSLATOR
+# BSL Translator
 
-This project uses Mediapipe for hand detection and ML model to classify gestures. The system uses real-time video input from a camera to detect hand landmarks and predict what letter the hand gesture relates to. It is built using version 3.11.9 of Python.
+[![Python](https://img.shields.io/badge/Python-3.11.9-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-Required-brightgreen.svg)](https://nodejs.org/)
 
-![Logo](https://github.com/JamesW162/Group9Project/blob/main/project/server/website/logo.png)
+A real-time British Sign Language (BSL) translator that uses computer vision and machine learning to recognize hand gestures and convert them to text. The system uses MediaPipe for hand landmark detection and a custom-trained ML model for gesture classification.
+
+![Logo](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/project/server/website/logo.png)
+
+## Features
+
+✨ **Real-time Translation** - Instant BSL gesture recognition using your camera  
+🤖 **Machine Learning** - Custom-trained model for accurate gesture classification  
+🔄 **Smart Auto-correction** - Improves word prediction accuracy  
+📱 **Raspberry Pi Support** - Deploy on embedded hardware with camera module  
+🌐 **Web Interface** - User-friendly web application with authentication  
+🔥 **Firebase Integration** - Cloud-based data synchronization and storage
 
 ## Installation
 
 ### Installation on a laptop/pc
 
-```
-git clone https://github.com/JamesW162/Group9Project
-cd Group9Project
+**Prerequisites:**
+- Python 3.11.9
+- Node.js and npm
+- Git
+
+**Steps:**
+
+```bash
+git clone https://github.com/Lewis-Cornelius/BSL-Translator
+cd BSL-Translator
 ```
 
-Open VS code in the Group9Project and run these commands in the terminal:
+Open the project in VS Code or your preferred editor and run these commands in the terminal:
 
 ```
 python -m venv myenv
@@ -26,26 +46,18 @@ npm install firebase
 npm install express body-parser cors
 ```
 
-You then need to add `bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json` from Firebase.
+You then need to add your Firebase Admin SDK JSON file.
 
 #### Steps to Download Your Firebase Admin SDK JSON File
-- Go to Firebase Console: Visit Firebase Console and log in.
-- Select Your Project: Click on the project associated with bsltranslator-93f00.
-- Open Project Settings:
-  - Click on the ⚙️ gear icon in the left sidebar.
-  - Choose Project settings.
-- Navigate to Service Accounts:
-  - In the Project settings, select the Service accounts tab.
-  - Scroll down and find Firebase Admin SDK.
-- Generate a New Private Key:
-  - Click Generate new private key.
-  - This will download a JSON file (firebase-adminsdk-xxxxx.json).
+1. Go to [Firebase Console](https://console.firebase.google.com/) and log in
+2. Select your project
+3. Click on the ⚙️ gear icon → **Project settings**
+4. Navigate to the **Service accounts** tab
+5. Click **Generate new private key**
+6. Save the downloaded JSON file as `bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json`
+7. Place it in `BSL-Translator/project/server`
 
-**Important Notes**
-- Handle with care! This file contains sensitive credentials. Do not expose it publicly.
-- Use in your backend: Place it in a secure location where only authorized applications can access it.
-- **MAKE SURE** to save it as `bsltranslator-93f00-firebase-adminsdk-fbsvc-55978db132.json`
-- **MAKE SURE** IT IS SAVED IN `Group9Project/project/server`
+> **⚠️ IMPORTANT:** This file contains sensitive credentials. Never commit it to version control. It's already excluded in `.gitignore`.
 
 To make sure everything is installed, run:
 
@@ -67,7 +79,7 @@ First, set up the Pi as shown below:
 - Red LED button connected to port D2
 - Grove-LCD RGB Backlight connected to port I2C
 
-![Raspberry Pi Setup](https://github.com/user-attachments/assets/61e809d4-83b1-43b0-ab5d-4606c24fc7a9)
+![Raspberry Pi Setup](https://github.com/Lewis-Cornelius/BSL-Translator/assets/61e809d4-83b1-43b0-ab5d-4606c24fc7a9)
 
 The only files you need from the repository are in the **`/RaspberryPi`** folder:
 - `live_stream_pi_code.py`
@@ -123,13 +135,17 @@ The web application includes:
 ## Training Your Own Model
 
 To train your own model:
-1. Run `collect_images.py` to capture hand gestures
-   - Configure `number_of_classes` for the number of letters (currently 3)
-   - Update `data_dict` path to your computer
-2. Run `process_data_for_training.py` to prepare the data
-3. Run `train_classifier.py` to create the model.p file
-4. Run `inference_classifier.py` to test the model
-   - Update `labels_dict` to match your classes (currently `{0: 'A', 1: 'B', 2: 'L'}`)
+
+1. **Collect Images** - Run `collect_images.py` to capture hand gestures
+   - Configure `number_of_classes` for the number of letters
+   - Update `data_dict` path to your local directory
+
+2. **Process Data** - Run `create_dataset.py` to prepare the training data
+
+3. **Train Model** - Run `train_classifier.py` to create the `model.p` file
+
+4. **Test Model** - Run `inference_classifier.py` to validate the model
+   - Update `labels_dict` to match your classes (e.g., `{0: 'A', 1: 'B', 2: 'L'}`)
 
 ## System Architecture
 
@@ -142,12 +158,14 @@ The data flows from the Raspberry Pi to Firebase, then to a PC/Laptop where the 
 ## Firebase Integration
 
 The system uses Firebase for real-time data storage and synchronization:
-![Firebase Structure](https://github.com/user-attachments/assets/f8e41ac4-51ef-4f1f-825d-01f8e867b1da)
+
+![Firebase Structure](https://github.com/Lewis-Cornelius/BSL-Translator/assets/f8e41ac4-51ef-4f1f-825d-01f8e867b1da)
 
 ## Web Interface
 
 The current web interface looks like this:
-![Web Interface](https://github.com/user-attachments/assets/9ce45291-fea6-4419-8a29-9f95c9cedc46)
+
+![Web Interface](https://github.com/Lewis-Cornelius/BSL-Translator/assets/9ce45291-fea6-4419-8a29-9f95c9cedc46)
 
 
 ## Video Tutorial for Reference
@@ -156,33 +174,53 @@ The current web interface looks like this:
 
 ## Future Development
 
-- Improve the AI model
-- Faster connection speeds
-- Expand supported gestures
-- Implement sentence construction
+- 🎯 Improve AI model accuracy and recognition speed
+- 🚀 Optimize connection speeds and reduce latency
+- 🔤 Expand supported gestures beyond fingerspelling
+- 📝 Implement intelligent sentence construction
+- 🌍 Add support for other sign languages
+- 📱 Develop mobile applications
 
 # Documentation
 
 ## Raspberry Pi
-- [Live Stream Pi Code](https://github.com/JamesW162/Group9Project/blob/main/Documentation/RasberryPi/live_stream_pi_code.md)
-- [On/Off Button Pi Code](https://github.com/JamesW162/Group9Project/blob/main/Documentation/RasberryPi/on_off_buttom_pi_code.md)
+- [Live Stream Pi Code](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/RasberryPi/live_stream_pi_code.md)
+- [On/Off Button Pi Code](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/RasberryPi/on_off_buttom_pi_code.md)
 
 ## Training Process
-- [Inference Classifier](https://github.com/JamesW162/Group9Project/blob/main/Documentation/Training_process/InferenceClassifier.md)
-- [Autocorrect](https://github.com/JamesW162/Group9Project/blob/main/Documentation/Training_process/autocorrect.md)
-- [Collect Images](https://github.com/JamesW162/Group9Project/blob/main/Documentation/Training_process/collect_images.md)
-- [Create Dataset](https://github.com/JamesW162/Group9Project/blob/main/Documentation/Training_process/createdataset.md)
-- [Train Classifier](https://github.com/JamesW162/Group9Project/blob/main/Documentation/Training_process/train_classifier.md)
+- [Inference Classifier](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/Training_process/InferenceClassifier.md)
+- [Autocorrect](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/Training_process/autocorrect.md)
+- [Collect Images](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/Training_process/collect_images.md)
+- [Create Dataset](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/Training_process/createdataset.md)
+- [Train Classifier](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/Training_process/train_classifier.md)
 
 ## Project Server
-- [BSL Bridge Integration](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/bsl_bridge_intergration.md)
-- [Firebase Stream Handler](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/firebase_stream_handler.md)
-- [Fix](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/fix.md)
-- [Fix 2](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/fix2.md)
-- [Server](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/server.md)
+- [BSL Bridge Integration](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/bsl_bridge_intergration.md)
+- [Firebase Stream Handler](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/firebase_stream_handler.md)
+- [Fix](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/fix.md)
+- [Fix 2](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/fix2.md)
+- [Server](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/server.md)
 
 ### Website
-- [Login](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/website/login.md)
-- [Main](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/website/main.md)
-- [Signup](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/website/signup.md)
-- [Webpage](https://github.com/JamesW162/Group9Project/blob/main/Documentation/project/server/website/webpage.md)
+- [Login](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/website/login.md)
+- [Main](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/website/main.md)
+- [Signup](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/website/signup.md)
+- [Webpage](https://github.com/Lewis-Cornelius/BSL-Translator/blob/main/Documentation/project/server/website/webpage.md)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- MediaPipe for hand landmark detection
+- Firebase for real-time data synchronization
+- The BSL community for gesture references
+
+---
+
+**Made with ❤️ for accessibility**
