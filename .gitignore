@@ -163,14 +163,25 @@ Thumbs.db
 *firebase*adminsdk*.json
 firebase-debug.log
 
-# Project specific
+# Project specific - ML models
 model.p
 project/server/model.p
 *.p
+data.pickle
+*.pickle
+
+# Project specific - Runtime files
 active_stream.txt
-interpreter_pid.txt
+*_pid.txt
+*.pid
 interpreter_error.log
 interpreter_output.log
+webcam_error.log
+webcam_output.log
 server.log
 translation_data.json
+device_config.json
+
+# Project specific - Temporary/test files
 asdasd
+

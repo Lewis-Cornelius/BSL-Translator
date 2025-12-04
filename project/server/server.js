@@ -59,19 +59,19 @@ app.get('/translation-data', (req, res) => {
 app.post('/update-translation', (req, res) => {
   try {
     const { translation } = req.body;
-    
+
     if (!translation) {
       return res.status(400).json({ error: 'Translation text is required' });
     }
-    
+
     const data = {
       translation,
       timestamp: Date.now()
     };
-    
+
     fs.writeFileSync(translationDataPath, JSON.stringify(data));
     console.log(`Translation updated: ${translation}`);
-    
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating translation:', err);
@@ -83,37 +83,37 @@ app.post('/update-translation', (req, res) => {
 app.post('/start-interpreter', (req, res) => {
   try {
     const { stream_id } = req.body;
-    
+
     if (!stream_id) {
       return res.status(400).json({ error: 'Stream ID is required' });
     }
-    
+
     console.log(`Starting interpreter for stream: ${stream_id}`);
-    
+
     // Save active stream ID to file
     fs.writeFileSync('active_stream.txt', stream_id);
-    
+
     // Launch the Python script with the stream ID
     const { spawn } = require('child_process');
-    const pythonProcess = spawn('python', ['bsl_bridge_intergration.py', stream_id]);
-    
+    const pythonProcess = spawn('python', ['bsl_bridge_integration.py', stream_id]);
+
     // Store the process ID for potential later termination
     fs.writeFileSync('interpreter_pid.txt', pythonProcess.pid.toString());
-    
+
     // Log stdout and stderr
     pythonProcess.stdout.on('data', (data) => {
       fs.appendFileSync('interpreter_output.log', data);
     });
-    
+
     pythonProcess.stderr.on('data', (data) => {
       fs.appendFileSync('interpreter_error.log', data);
     });
-    
+
     // Handle process exit
     pythonProcess.on('close', (code) => {
       console.log(`Interpreter process exited with code ${code}`);
     });
-    
+
     res.json({
       success: true,
       message: `Interpreter started for stream: ${stream_id}`,
@@ -121,9 +121,9 @@ app.post('/start-interpreter', (req, res) => {
     });
   } catch (err) {
     console.error('Error starting interpreter:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      error: 'Failed to start interpreter: ' + err.message 
+      error: 'Failed to start interpreter: ' + err.message
     });
   }
 });
@@ -133,32 +133,32 @@ app.post('/start-interpreter', (req, res) => {
 app.post('/start-webcam-mode', (req, res) => {
   try {
     console.log('Starting BSL Translator in PC Webcam Mode');
-    
+
     // Launch the Python webcam script
     const { spawn } = require('child_process');
     const pythonProcess = spawn('python', ['bsl_webcam_standalone.py'], {
       cwd: __dirname  // Run in the server directory
     });
-    
+
     // Store the process ID for potential later termination
     fs.writeFileSync('webcam_pid.txt', pythonProcess.pid.toString());
-    
+
     // Log stdout and stderr
     pythonProcess.stdout.on('data', (data) => {
       console.log(`Webcam Mode: ${data}`);
       fs.appendFileSync('webcam_output.log', data);
     });
-    
+
     pythonProcess.stderr.on('data', (data) => {
       console.error(`Webcam Mode Error: ${data}`);
       fs.appendFileSync('webcam_error.log', data);
     });
-    
+
     // Handle process exit
     pythonProcess.on('close', (code) => {
       console.log(`Webcam mode process exited with code ${code}`);
     });
-    
+
     res.json({
       success: true,
       message: 'PC Webcam Mode started successfully',
@@ -167,9 +167,9 @@ app.post('/start-webcam-mode', (req, res) => {
     });
   } catch (err) {
     console.error('Error starting webcam mode:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      error: 'Failed to start webcam mode: ' + err.message 
+      error: 'Failed to start webcam mode: ' + err.message
     });
   }
 });
@@ -187,7 +187,7 @@ app.get('/debug-files', (req, res) => {
     websiteExists: fs.existsSync(websitePath),
     files: []
   };
-  
+
   if (files.websiteExists) {
     try {
       files.files = fs.readdirSync(websitePath);
@@ -195,7 +195,7 @@ app.get('/debug-files', (req, res) => {
       files.error = err.message;
     }
   }
-  
+
   res.json(files);
 });
 
